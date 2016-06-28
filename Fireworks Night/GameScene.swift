@@ -39,14 +39,40 @@ class GameScene: SKScene {
         gameTimer = NSTimer.scheduledTimerWithTimeInterval(6, target: self, selector: #selector(launchFireworks), userInfo: nil, repeats: true)
     }
     
+    /*
+     * Function Name: touchesBegan
+     * Parameters: touches = the touches that occurred at the begginning of the event.
+     *   event - the event associated with the touches.
+     * Purpose: This method calls another method to see what has been touching begins.
+     * Return Value: None
+     */
+    
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-       /* Called when a touch begins */
-        
-        
+        super.touchesBegan(touches, withEvent: event)
+        checkForTouches(touches)
+    }
+    
+    /*
+     * Function Name: touchesMoved
+     * Parameters: touches - the touches that occurred during the event.
+     *   event - the event associated with the touches.
+     * Purpose: This method calls another method to see what has been touched when moving.
+     * Return Value: None
+     */
+    
+    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        super.touchesMoved(touches, withEvent: event)
+        checkForTouches(touches)
     }
    
-    override func update(currentTime: CFTimeInterval) {
-        /* Called before each frame is rendered */
+    override func update(currentTime: NSTimeInterval) {
+        for (index, firework) in fireworks.enumerate().reverse() {
+            if firework.position.y > 900 {
+                // this uses a position high above so that rockets can explode off screen
+                fireworks.removeAtIndex(index)
+                firework.removeFromParent()
+            }
+        }
     }
     
     /*
@@ -151,6 +177,40 @@ class GameScene: SKScene {
             
         default:
             break
+        }
+    }
+    
+    /*
+     * Function Name: checkForTouches
+     * Parameters: touches - the touches that we need to check.
+     * Purpose: This method checks touches that are passed into it. It checks to see if any of the touches
+     *   were at a location where there was an unselected firework and selects it.
+     * Return Value: None
+     */
+    
+    func checkForTouches(touches: Set<UITouch>) {
+        guard let touch = touches.first else { return }
+        
+        let location = touch.locationInNode(self)
+        let nodes = nodesAtPoint(location)
+        
+        for node in nodes {
+            if node is SKSpriteNode {
+                let sprite = node as! SKSpriteNode
+                
+                if sprite.name == "firework" {
+                    for parent in fireworks {
+                        let firework = parent.children[0] as! SKSpriteNode
+                        
+                        if firework.name == "selected" && firework.color != sprite.color {
+                            firework.name = "firework"
+                            firework.colorBlendFactor = 1
+                        }
+                    }
+                    sprite.name = "selected"
+                    sprite.colorBlendFactor = 0
+                }
+            }
         }
     }
 }
