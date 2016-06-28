@@ -50,4 +50,18 @@ class GameViewController: UIViewController {
     override func prefersStatusBarHidden() -> Bool {
         return true
     }
+    
+    /*
+     * Function Name: motionBegan
+     * Parameters: motion - the motion that occured during the event.
+     *   event - the event that the motion is associated with.
+     * Purpose: This method responds to device motion by exploding fireworks selected in the game scene.
+     * Return Value: None
+     */
+    
+    override func motionBegan(motion: UIEventSubtype, withEvent event: UIEvent?) {
+        let skView = view as! SKView
+        let gameScene = skView.scene as! GameScene
+        gameScene.explodeFireworks()
+    }
 }

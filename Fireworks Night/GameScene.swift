@@ -23,11 +23,14 @@ class GameScene: SKScene {
     let rightEdge = 1024 + 22
     
     // Keeps track of the user's score.
-    var score: Int = 0 {
-        didSet {
-            // your code here
-        }
-    }
+    var score: Int = 0
+    
+    /*
+     * Function Name: didMoveToView
+     * Parameters: view - the view that is presenting the scene we are moving to.
+     * Purpose: This method sets up the scene visually and starts a timer for launching fireworks.
+     * Return Value: None
+     */
     
     override func didMoveToView(view: SKView) {
         let background = SKSpriteNode(imageNamed: "background")
@@ -211,6 +214,60 @@ class GameScene: SKScene {
                     sprite.colorBlendFactor = 0
                 }
             }
+        }
+    }
+    
+    /*
+     * Function Name: explodeFirework
+     * Parameters: firework - the firework that is going to explode.
+     * Purpose: This method creates an explosion where the firework is located and removes it from the scene.
+     * Return Value: None
+     */
+    
+    func explodeFirework(firework: SKNode) {
+        let emitter = SKEmitterNode(fileNamed: "explode")!
+        emitter.position = firework.position
+        addChild(emitter)
+        
+        firework.removeFromParent()
+    }
+    
+    /*
+     * Function Name: explodeFireworks
+     * Parameters: None
+     * Purpose: This method exlodes all of the fireworks that are selected and updates the user's
+     *    score depending on how many have been blown up.
+     * Return Value: None
+     */
+    
+    func explodeFireworks() {
+        var numExploded = 0
+        
+        for (index, fireworkContainer) in fireworks.enumerate().reverse() {
+            let firework = fireworkContainer.children[0] as! SKSpriteNode
+            
+            if firework.name == "selected" {
+                // destroy this firework!
+                explodeFirework(fireworkContainer)
+                fireworks.removeAtIndex(index)
+                
+                numExploded += 1
+            }
+        }
+        
+        switch numExploded {
+        case 0:
+            break
+        case 1:
+            score += 200
+        case 2:
+            score += 500
+        case 3:
+            score += 1500
+        case 4:
+            score += 2500
+        default:
+            score += 4000
         }
     }
 }
